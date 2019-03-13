@@ -1,9 +1,12 @@
 package ir.mirrajabi.okhttpjsonmock;
 
 import java.io.IOException;
-import java.util.Random;
+import java.util.List;
+import java.util.concurrent.*;
 
 import ir.mirrajabi.okhttpjsonmock.helpers.ResourcesHelper;
+import ir.mirrajabi.okhttpjsonmock.helpers.ResponseHandler;
+import ir.mirrajabi.okhttpjsonmock.helpers.ResponsesQueue;
 import ir.mirrajabi.okhttpjsonmock.providers.DefaultInputStreamProvider;
 import ir.mirrajabi.okhttpjsonmock.providers.InputStreamProvider;
 import okhttp3.HttpUrl;
@@ -16,7 +19,7 @@ import okhttp3.ResponseBody;
 public class OkHttpMockInterceptor implements Interceptor {
     private final static String DEFAULT_BASE_PATH = "";
     private final static int DELAY_DEFAULT_MIN = 500;
-    private final static int DELAY_DEFAULT_MAX = 1500;
+    private final static int DELAY_DEFAULT_MAX = 15000;
 
     private int failurePercentage;
     private String basePath;
@@ -59,35 +62,46 @@ public class OkHttpMockInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         HttpUrl url = chain.request().url();
-        String sym = "";
-        String query = url.encodedQuery() == null ? "" : url.encodedQuery();
-        if (!query.equals(""))
-            sym = "/";
-        String path = url.encodedPath() + sym + query;
-        String responseString = ResourcesHelper.loadFileAsString(inputStreamProvider,
-                basePath + path.substring(1) + ".json");
-        if (responseString == null)
-            responseString = ResourcesHelper.loadFileAsString(inputStreamProvider,
-                    basePath + url.encodedPath().substring(1) + ".json");
-        String result = responseString != null ? responseString : "";
-        try {
-            Thread.sleep(Math.abs(new Random()
-                    .nextInt() % (maxDelayMilliseconds - minDelayMilliseconds))
-                    + minDelayMilliseconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        String assetsPath = url.encodedPath().replaceFirst("/", "");
+        List<String> listOfResponses = inputStreamProvider.list(assetsPath);
+        int size = listOfResponses.size();
+        if (size == 0) {
+            return chain.proceed(chain.request());
         }
-        boolean failure = Math.abs(new Random().nextInt() % 100) < failurePercentage;
-        int statusCode = failure ? 504 : 200;
-        if (failure)
-            System.out.print("JsonMockServer: Returning result from " +
-                    path + "\t\tStatusCode : " + statusCode);
-        else
-            System.out.print("JsonMockServer: Returning result from " +
-                    path + "\t\tStatusCode : " + statusCode);
+        String file = "";
+        try {
+            CountDownLatch latch = new CountDownLatch(1);
+            ResponseHandler handler = new ResponseHandler(
+                    chain.request().method() + " " + chain.request().url().encodedPath() + "/"
+                            + (chain.request().url().encodedQuery() != null ? chain.request().url().encodedQuery() : "")
+                            + (chain.request().body() != null ? " BODY: " + chain.request().body() : ""),
+                    listOfResponses, latch);
+            ResponsesQueue.getInstance().push(handler);
+            latch.await();//latch.await(maxDelayMilliseconds,TimeUnit.MILLISECONDS);
 
+            file = handler.getFileName();
+        } catch (InterruptedException e) {
+            return chain.proceed(chain.request());
+        }
+        if (file == null) {
+            return chain.proceed(chain.request());
+        }
+        String responseString =
+                ResourcesHelper.loadFileAsString(
+                        inputStreamProvider,
+                        assetsPath + "/" + file
+                );
+
+        String result = responseString != null ? responseString : "";
+
+        int code;
+        try {
+            code = Integer.parseInt(file.substring(4, 6));
+        } catch (Exception e) {
+            code = 200;
+        }
         return new Response.Builder()
-                .code(statusCode)
+                .code(code)
                 .message(responseString)
                 .request(chain.request())
                 .protocol(Protocol.HTTP_1_0)

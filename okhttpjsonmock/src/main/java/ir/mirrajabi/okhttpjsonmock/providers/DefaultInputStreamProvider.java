@@ -1,9 +1,10 @@
 package ir.mirrajabi.okhttpjsonmock.providers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.*;
+import java.util.Collections;
+import java.util.List;
 
 public class DefaultInputStreamProvider implements InputStreamProvider {
     @Override
@@ -14,5 +15,11 @@ public class DefaultInputStreamProvider implements InputStreamProvider {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public List<String> list(String path) throws IOException {
+        //TODO
+        throw new NotImplementedException();
     }
 }
