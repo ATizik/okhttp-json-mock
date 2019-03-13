@@ -18,7 +18,7 @@ allprojects {
 Then add the dependency in modules build.gradle file
 ```gradle
 dependencies {
-    compile 'com.github.mirrajabi:okhttp-json-mock:3.0'
+    implementation'studio.icecreamhappens:okhttp-mock-suit:4.0-alpha01'
  }
 ```
 
@@ -66,12 +66,24 @@ OkHttpClient client = new OkHttpClient.Builder()
 ```
 
 
-### Changelog
+## 4. Implement listener, for example if you want to use AlertDialog to choose appropriate json reponse:
+```
+ResponsesQueue.getInstance().setListener { responseHandler ->
+                launch(Dispatchers.Main) {
+                    val list = responseHandler.files.toTypedArray()
+                    AlertDialog.Builder(this@MainActivit)
+                        .setTitle(responseHandler.methodName)
+                        .setItems(list) { dialog, which ->
+                            responseHandler.fileName = list[which]
+                        }.apply {
+                            setOnDismissListener {
+                                responseHandler.dismissed()
+                            }
+                            show()
+                        }
+                }
+            }
+```
 
-3.0 - `Removed wrapper for mocked responses`
-
-2.0 - `The library no longer depends on android classes`
-
-1.1.1 - `Fixes file name lowercase issue`
-
-1.1 - `Adds delay customization option.`
+Original idea and code:
+https://github.com/mirrajabi/okhttp-json-mock
