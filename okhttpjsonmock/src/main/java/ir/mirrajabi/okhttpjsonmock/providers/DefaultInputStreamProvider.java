@@ -1,6 +1,6 @@
 package ir.mirrajabi.okhttpjsonmock.providers;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 import java.io.*;
 import java.util.Collections;
@@ -20,6 +20,6 @@ public class DefaultInputStreamProvider implements InputStreamProvider {
     @Override
     public List<String> list(String path) throws IOException {
         //TODO
-        throw new NotImplementedException();
+        throw new IllegalStateException();
     }
 }

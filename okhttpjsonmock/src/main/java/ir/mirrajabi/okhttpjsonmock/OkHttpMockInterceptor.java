@@ -89,7 +89,7 @@ public class OkHttpMockInterceptor implements Interceptor {
         String responseString =
                 ResourcesHelper.loadFileAsString(
                         inputStreamProvider,
-                        assetsPath + "/" + file
+                        assetsPath + file
                 );
 
         String result = responseString != null ? responseString : "";
