@@ -2,6 +2,7 @@ package ir.mirrajabi.okhttpjsonmock;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 import ir.mirrajabi.okhttpjsonmock.helpers.ResourcesHelper;
@@ -78,7 +79,9 @@ public class OkHttpMockInterceptor implements Interceptor {
                     listOfResponses, latch);
             ResponsesQueue.getInstance().push(handler);
             latch.await();//latch.await(maxDelayMilliseconds,TimeUnit.MILLISECONDS);
-
+            Thread.sleep(Math.abs(new Random()
+                    .nextInt() % (maxDelayMilliseconds - minDelayMilliseconds))
+                    + minDelayMilliseconds);
             file = handler.getFileName();
         } catch (InterruptedException e) {
             return chain.proceed(chain.request());
