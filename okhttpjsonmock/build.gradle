@@ -24,7 +24,7 @@ publish {
     groupId = 'studio.icecreamhappens'
     repoName = 'maven'
     artifactId = 'okhttp-mock-suit'
-    publishVersion = '4.0-alpha03'
+    publishVersion = '4.0-alpha04'
     desc = 'OkHttp json mock suit'
     website = 'https://github.com/ATizik/okhttp-json-mock'
 }

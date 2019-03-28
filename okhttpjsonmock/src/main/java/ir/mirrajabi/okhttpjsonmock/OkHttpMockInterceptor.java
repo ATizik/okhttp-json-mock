@@ -78,7 +78,7 @@ public class OkHttpMockInterceptor implements Interceptor {
                             + (chain.request().body() != null ? " BODY: " + chain.request().body() : ""),
                     listOfResponses, latch);
             ResponsesQueue.getInstance().push(handler);
-            latch.await();//latch.await(maxDelayMilliseconds,TimeUnit.MILLISECONDS);
+            latch.await();
             Thread.sleep(Math.abs(new Random()
                     .nextInt() % (maxDelayMilliseconds - minDelayMilliseconds))
                     + minDelayMilliseconds);
@@ -88,6 +88,9 @@ public class OkHttpMockInterceptor implements Interceptor {
         }
         if (file == null) {
             return chain.proceed(chain.request());
+        }
+        if(!assetsPath.endsWith("/")) {
+            assetsPath += "/";
         }
         String responseString =
                 ResourcesHelper.loadFileAsString(
