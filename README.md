@@ -1,9 +1,7 @@
-# okhttp-json-mock
-[![](https://jitpack.io/v/mirrajabi/okhttp-json-mock.svg?style=flat-square)](https://jitpack.io/#mirrajabi/okhttp-json-mock)
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Okhttp%20Json%20Mock-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/5239)
+# okhttp-mock-suit
+ [ ![Download](null/packages/atizik/maven/okhttp-mock-suit/images/download.svg?version=4.0-alpha03) ](https://bintray.com/atizik/maven/okhttp-mock-suit/4.0-alpha03/link)
 
-This simple library helps you mock your data for using with okhttp+retrofit in json format in just a few moves.
-it forwards the requests to local json files and returns the data stored in them.
+Simple interceptor for OkHttp that replaces remote data with any data that you provide - put mock reponses in local storage or assets folder and replace away
 
 ### Usage
 First add jitpack to your projects build.gradle file
@@ -18,7 +16,7 @@ allprojects {
 Then add the dependency in modules build.gradle file
 ```gradle
 dependencies {
-    implementation'studio.icecreamhappens:okhttp-mock-suit:4.0-alpha01'
+    implementation'studio.icecreamhappens:okhttp-mock-suit:4.0-alpha03'
  }
 ```
 
@@ -43,26 +41,6 @@ InputStreamProvider inputStreamProvider = new InputStreamProvider() {
 OkHttpClient client = new OkHttpClient.Builder()
     .addInterceptor(new OkHttpMockInterceptor(getAndroidProvider(), 5))
     .build();
-```
-
-#### 3. Put your json models in assets folder like the [examples](https://github.com/mirrajabi/okhttp-json-mock/tree/master/app/src/main/assets)
-```
-\---api
-    \---v1
-        \---users
-            |   1.json
-            |   2.json
-            |   3.json
-            |   page=1.json
-            |
-            +---1
-            |       phoneNumbers.json
-            |
-            +---2
-            |       phoneNumbers.json
-            |
-            \---3
-                    phoneNumbers.json
 ```
 
 
